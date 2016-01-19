@@ -201,6 +201,10 @@ def main():
                       help="The address where the database is located.",
                       type="string")
 
+    parser.add_option("--database-name", dest="db_name",
+                  help="The name of the database.",
+                  type="string")
+
     parser.add_option("--job-id", dest="job_id",
                       help="The id number of the job to launch in the database.",
                       type="int")
@@ -216,14 +220,14 @@ def main():
     if not options.job_id:
         parser.error('Job ID not given or an ID of 0 was used.')
 
-    launch(options.db_address, options.experiment_name, options.job_id)
+    launch(options.db_address, options.db_name, options.experiment_name, options.job_id)
 
-def launch(db_address, experiment_name, job_id):
+def launch(db_address, db_name, experiment_name, job_id):
     """
     Launches a job from on a given id.
     """
 
-    db  = MongoDB(database_address=db_address)
+    db  = MongoDB(database_address=db_address, database_name=db_name)
     job = db.load(experiment_name, 'jobs', {'id' : job_id})
 
     start_time        = time.time()

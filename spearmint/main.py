@@ -257,8 +257,9 @@ def main():
 
     # Connect to the database
     db_address = options['database']['address']
-    sys.stderr.write('Using database at %s.\n' % db_address)        
-    db         = MongoDB(database_address=db_address)
+    db_name = options['database']['name']
+    sys.stderr.write('Using database %s at %s.\n' % (db_name, db_address))
+    db         = MongoDB(database_address=db_address, database_name=db_name)
     
     while True:
 
@@ -286,7 +287,7 @@ def main():
                 suggested_job = get_suggestion(chooser, resource.tasks, db, expt_dir, options, resource_name)
     
                 # Submit the job to the appropriate resource
-                process_id = resource.attemptDispatch(experiment_name, suggested_job, db_address, expt_dir)
+                process_id = resource.attemptDispatch(experiment_name, suggested_job, db_address, db_name, expt_dir)
 
                 # Set the status of the job appropriately (successfully submitted or not)
                 if process_id is None:

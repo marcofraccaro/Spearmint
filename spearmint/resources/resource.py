@@ -338,7 +338,7 @@ class Resource(object):
 
         return self.scheduler.alive(job['proc_id'])
 
-    def attemptDispatch(self, experiment_name, job, db_address, expt_dir):
+    def attemptDispatch(self, experiment_name, job, db_address, db_name, expt_dir):
         """submit a new job using the scheduler
         
         Parameters
@@ -355,7 +355,7 @@ class Resource(object):
         if job['resource'] != self.name:
             raise Exception("This job does not belong to me!")
 
-        process_id = self.scheduler.submit(job['id'], experiment_name, expt_dir, db_address)
+        process_id = self.scheduler.submit(job['id'], experiment_name, expt_dir, db_address, db_name)
 
         if process_id is not None:
             sys.stderr.write('Submitted job %d with %s scheduler (process id: %d).\n' % 
