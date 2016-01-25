@@ -6,8 +6,8 @@ from spearmint.utils.database.mongodb import MongoDB
 from spearmint.main import load_jobs
 
 
-# Loads database into a pandas dataframe
-def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment_name = 'rnn_3'):
+# Loads database into a (sorted) pandas dataframe
+def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment_name = 'rnn_3', sorted=""):
 
     db = MongoDB(database_address=db_address,database_name=db_name)
 
@@ -43,5 +43,20 @@ def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment
         # Append dataframe
         df=df.append(df_tmp, ignore_index=True)
 
+
+    if sorted:
+        df=df.sort_values(by=sorted, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
+
+
     return df
+
+
+# Print the head of the (sorted) database
+def print_df(df=None, N=10, sorted=""):
+
+    if df is None:
+        df = db_to_df(sorted=sorted)
+
+
+    print df.head(N)
 
