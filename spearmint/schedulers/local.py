@@ -204,13 +204,16 @@ class LocalScheduler(AbstractScheduler):
         if not os.path.isdir(output_directory):
             os.mkdir(output_directory)
 
-        # allow the user to specify a subdirectory for the output
+        # allow the user to specify a subdirectory for the output, otherwise use experiment_name to name the subfolder
         if "output-subdir" in self.options:
             output_directory = os.path.join(output_directory, self.options['output-subdir'])
-            if not os.path.isdir(output_directory):
-                os.mkdir(output_directory)
+        else:
+            output_directory = os.path.join(output_directory, experiment_name)
 
-        output_filename = os.path.join(output_directory, '%08d.out' % job_id)
+        if not os.path.isdir(output_directory):
+            os.mkdir(output_directory)
+
+        output_filename = os.path.join(output_directory, experiment_name + '_%08d.log' % job_id)
         output_file = open(output_filename, 'w')
 
         process = subprocess.Popen(cmd, stdout=output_file, 

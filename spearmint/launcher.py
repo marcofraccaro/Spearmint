@@ -244,7 +244,7 @@ def launch(db_address, db_name, experiment_name, job_id):
             result = matlab_launcher(job)
 
         elif job['language'].lower() == 'python':
-            result = python_launcher(job)
+            result = python_launcher(job, experiment_name)
 
         elif job['language'].lower() == 'shell':
             result = shell_launcher(job)
@@ -296,7 +296,7 @@ def launch(db_address, db_name, experiment_name, job_id):
 
     db.save(job, experiment_name, 'jobs', {'id' : job_id})
 
-def python_launcher(job):
+def python_launcher(job, experiment_name):
     # Run a Python function
     sys.stderr.write("Running python job.\n")
 
@@ -328,7 +328,7 @@ def python_launcher(job):
     sys.stderr.write('Importing %s.py\n' % main_file)
     module  = __import__(main_file)
     sys.stderr.write('Running %s.main()\n' % main_file)
-    result = module.main(job['id'], params)
+    result = module.main(job['id'], experiment_name, params)
 
     # Change back out.
     os.chdir('..')
