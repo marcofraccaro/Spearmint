@@ -203,6 +203,8 @@ from spearmint.resources.resource import print_resources_status
 
 from spearmint.utils.parsing import parse_db_address
 
+import csv
+
 def get_options():
     parser = optparse.OptionParser(usage="usage: %prog [options] directory")
 
@@ -260,9 +262,11 @@ def main():
     db_name = options['database']['name']
     sys.stderr.write('Using database %s at %s.\n' % (db_name, db_address))
     db         = MongoDB(database_address=db_address, database_name=db_name)
-    
-    while True:
 
+
+    suggest_file = os.path.join(expt_dir , experiment_name + ".suggest")
+    suggest_idx = 0
+    while True:
         for resource_name, resource in resources.iteritems():
 
             jobs = load_jobs(db, experiment_name)
@@ -274,7 +278,10 @@ def main():
             # Note: I chose to fill up one resource and them move on to the next
             # You could also do it the other way, by changing "while" to "if" here
 
+
             while resource.acceptingJobs(jobs):
+
+                #db['rnn_8.jobs'].remove({status:'new'})
 
                 # Load jobs from DB 
                 # (move out of one or both loops?) would need to pass into load_tasks
@@ -285,7 +292,24 @@ def main():
 
                 # Get a suggestion for the next job
                 suggested_job = get_suggestion(chooser, resource.tasks, db, expt_dir, options, resource_name)
-    
+
+                # Check if the file for the manual suggestions exists
+                if os.path.isfile(suggest_file):
+                    suggest_params = []
+                    with open(suggest_file,'r') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        # Concatenate all the suggestions in the file
+                        for row in reader:
+                            suggest_params = suggest_params + [row]
+
+                        # If a new line is added to the file we overwrite the suggested jobs with these values
+                        if suggest_idx < len(suggest_params):
+                            next_suggestion = suggest_params[suggest_idx]
+                            for key, value in next_suggestion.iteritems():
+                                print "--- Using manual suggestion instead of the one coming from the GP! ---"
+                                suggested_job['params'][key.strip()]['values'][0] = value
+                            suggest_idx = suggest_idx + 1
+
                 # Submit the job to the appropriate resource
                 process_id = resource.attemptDispatch(experiment_name, suggested_job, db_address, db_name, expt_dir)
 
