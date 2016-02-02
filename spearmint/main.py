@@ -293,22 +293,27 @@ def main():
                 # Get a suggestion for the next job
                 suggested_job = get_suggestion(chooser, resource.tasks, db, expt_dir, options, resource_name)
 
-                # Check if the file for the manual suggestions exists
-                if os.path.isfile(suggest_file):
-                    suggest_params = []
-                    with open(suggest_file,'r') as csvfile:
-                        reader = csv.DictReader(csvfile)
-                        # Concatenate all the suggestions in the file
-                        for row in reader:
-                            suggest_params = suggest_params + [row]
+                try:
+                    # Check if the file for the manual suggestions exists
+                    if os.path.isfile(suggest_file):
+                        suggest_params = []
+                        with open(suggest_file,'r') as csvfile:
+                            # There should not be a blank line in the beginning of the file!
+                            reader = csv.DictReader(csvfile)
+                            # Concatenate all the suggestions in the file
+                            for row in reader:
+                                suggest_params = suggest_params + [row]
 
-                        # If a new line is added to the file we overwrite the suggested jobs with these values
-                        if suggest_idx < len(suggest_params):
-                            next_suggestion = suggest_params[suggest_idx]
-                            for key, value in next_suggestion.iteritems():
+                            # If a new line is added to the file we overwrite the suggested jobs with these values
+                            if suggest_idx < len(suggest_params):
                                 print "--- Using manual suggestion instead of the one coming from the GP! ---"
-                                suggested_job['params'][key.strip()]['values'][0] = value
-                            suggest_idx = suggest_idx + 1
+                                next_suggestion = suggest_params[suggest_idx]
+                                for key, value in next_suggestion.iteritems():
+                                    suggested_job['params'][key.strip()]['values'][0] = value
+                                    suggested_job['manual'] = 1
+                                suggest_idx = suggest_idx + 1
+                except:
+                    print "--- Problem using the manual suggestion file! Back to the GP suggestion.. ---"
 
                 # Submit the job to the appropriate resource
                 process_id = resource.attemptDispatch(experiment_name, suggested_job, db_address, db_name, expt_dir)
@@ -419,7 +424,8 @@ def get_suggestion(chooser, task_names, db, expt_dir, options, resource_name):
         'status'      : 'new',
         'submit time' : time.time(),
         'start time'  : None,
-        'end time'    : None
+        'end time'    : None,
+        'manual'      : 0
     }
 
     save_job(job, db, experiment_name)
