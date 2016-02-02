@@ -31,6 +31,10 @@ def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment
         for par in job["params"]:
             tmp= tmp + ((par,[job["params"][par]["values"][0]]),)
         tmp=tmp + (("duration_h",[(job["end time"]-job["start time"])/3600.0]),)
+        try: # for backward compatibility
+            tmp=tmp + (("manual",[job["manual"]]),)
+        except:
+            pass
         tmp=tmp + (("start_time",[job["start time"]]),)
         tmp=tmp + (("end_time",[job["end time"]]),)
         tmp=tmp + (("values",[job["values"]['nlp']]),)
@@ -43,20 +47,14 @@ def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment
         # Append dataframe
         df=df.append(df_tmp, ignore_index=True)
 
-
-    if sorted:
-        df=df.sort_values(by=sorted, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
-
-
     return df
 
 
 # Print the head of the (sorted) database
-def print_df(df=None, N=10, sorted=""):
+def print_df(df, sorted=""):
 
-    if df is None:
-        df = db_to_df(sorted=sorted)
+    if sorted:
+        df=df.sort_values(by=sorted, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
 
-
-    print df.head(N)
-
+    cols=range(len(df.columns))
+    print df.to_string(columns=cols[:-3],float_format=lambda x: '%.3f' % x)
