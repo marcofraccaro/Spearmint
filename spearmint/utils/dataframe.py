@@ -7,7 +7,7 @@ from spearmint.main import load_jobs
 
 
 # Loads database into a (sorted) pandas dataframe
-def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment_name = 'rnn_3', sorted=""):
+def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment_name = 'rnn_3'):
 
     db = MongoDB(database_address=db_address,database_name=db_name)
 
