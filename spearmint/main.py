@@ -311,6 +311,7 @@ def main():
                                 for key, value in next_suggestion.iteritems():
                                     suggested_job['params'][key.strip()]['values'][0] = value
                                     suggested_job['manual'] = 1
+                                    print "%s: %s" %(key.strip(),value)
                                 suggest_idx = suggest_idx + 1
                 except:
                     print "--- Problem using the manual suggestion file! Back to the GP suggestion.. ---"
