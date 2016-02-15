@@ -309,6 +309,8 @@ def main():
                                 print "--- Using manual suggestion instead of the one coming from the GP! ---"
                                 next_suggestion = suggest_params[suggest_idx]
                                 for key, value in next_suggestion.iteritems():
+                                    if isinstance(value,str):
+                                        value=value.strip()
                                     suggested_job['params'][key.strip()]['values'][0] = value
                                     suggested_job['manual'] = 1
                                     print "%s: %s" %(key.strip(),value)
