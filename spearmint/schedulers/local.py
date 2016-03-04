@@ -214,7 +214,7 @@ class LocalScheduler(AbstractScheduler):
             os.mkdir(output_directory)
 
         output_filename = os.path.join(output_directory, experiment_name + '_%08d.log' % job_id)
-        output_file = open(output_filename, 'w')
+        output_file = open(output_filename, 'w', 1)
 
         process = subprocess.Popen(cmd, stdout=output_file, 
                                         stderr=output_file, 
