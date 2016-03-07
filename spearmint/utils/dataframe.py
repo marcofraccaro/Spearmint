@@ -28,6 +28,7 @@ def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment
         # Data from DB to a OrderedDict
         tmp=(("job_id",[job["id"]]),)
         tmp=tmp + (("exp_values",[np.exp(job["values"]['nlp'])]),)
+        tmp=tmp + (("values",[job["values"]['nlp']]),)
         for par in job["params"]:
             tmp= tmp + ((par,[job["params"][par]["values"][0]]),)
         tmp=tmp + (("duration_h",[(job["end time"]-job["start time"])/3600.0]),)
@@ -37,7 +38,6 @@ def db_to_df(db_address = 'localhost', db_name= "spearmintDB_marfra", experiment
             pass
         tmp=tmp + (("start_time",[job["start time"]]),)
         tmp=tmp + (("end_time",[job["end time"]]),)
-        tmp=tmp + (("values",[job["values"]['nlp']]),)
 
         dict_tmp = OrderedDict(tmp)
 
@@ -57,4 +57,4 @@ def print_df(df, sorted=""):
         df=df.sort_values(by=sorted, axis=0, ascending=True, inplace=False, kind='quicksort', na_position='last')
 
     cols=range(len(df.columns))
-    print df.to_string(columns=cols[:-3],float_format=lambda x: '%.3f' % x)
+    print df.to_string(columns=cols[:-2],float_format=lambda x: '%.3f' % x)
